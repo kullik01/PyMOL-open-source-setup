@@ -10,7 +10,7 @@ AppName=PyMOL-open-source
 AppVersion=3.0.0
 AppCopyright=Hannah Kullik, Martin Urban, Schrodinger LLC
 AppId={{192F52C3-D86D-4735-9929-C7DF593CB534}
-DefaultDirName={localappdata}\PyMOL-open-source
+DefaultDirName={userappdata}\PyMOL-open-source
 AppPublisher=Hannah Kullik
 VersionInfoProductName=PyMOL-open-source
 MinVersion=10.0.19045
@@ -27,38 +27,45 @@ UninstallDisplayName=PyMOL-open-source
 UninstallDisplayIcon={app}\assets\logo.ico
 LicenseFile=LICENSE.txt
 ; This is necessary if the setup will exceed 2 GB
-DiskSpanning=yes
-DiskSliceSize=2100000000
+DiskSpanning=no
+; DiskSliceSize=2100000000
+PrivilegesRequired=none
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
-Name: "{localappdata}\PyMOL-open-source"
-Name: "{localappdata}\PyMOL-open-source\bin"
-Name: "{localappdata}\PyMOL-open-source\tmp"
+Name: "{userappdata}\PyMOL-open-source"
+Name: "{userappdata}\PyMOL-open-source\bin"
+Name: "{userappdata}\PyMOL-open-source\tmp"
 
 [Files]
-Source: "src\PostInstallationRunner.exe"; DestDir: "{localappdata}\IBCI\helpers"; Flags: ignoreversion
-Source: "src\offline_resources\windows_package.zip"; DestDir: "{localappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "src\offline_resources\alma-colabfold-9-rootfs.tar"; DestDir: "{localappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "src\offline_resources\ChimeraX-1.8.exe"; DestDir: "{localappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "src\install.bat"; DestDir: "{localappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "src\uninstall.bat"; DestDir: "{localappdata}\IBCI\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "src\assets\logo.ico"; DestDir: "{localappdata}\IBCI\PyDD\assets"; Flags: ignoreversion recursesubdirs createallsubdirs;
+;Source: "src\PostInstallationRunner.exe"; DestDir: "{userappdata}\IBCI\helpers"; Flags: ignoreversion
+;Source: "src\offline_resources\windows_package.zip"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+;Source: "src\offline_resources\alma-colabfold-9-rootfs.tar"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+;Source: "src\offline_resources\ChimeraX-1.8.exe"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+;Source: "src\install.bat"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+;Source: "src\uninstall.bat"; DestDir: "{userappdata}\IBCI\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs;
+;Source: "src\assets\logo.ico"; DestDir: "{userappdata}\IBCI\PyDD\assets"; Flags: ignoreversion recursesubdirs createallsubdirs;
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{localappdata}\PyMOL-open-source"
+Type: filesandordirs; Name: "{userappdata}\PyMOL-open-source"
 
 [Code]
 var 
   tmpResultCode: Integer; 
   PostInstallFailed: Boolean;
+  AppDataDir: string;
+  PostInstallerExeFilepath: string;
 
 procedure InitializeWizard;
 begin
   // Initialize the global variable
   PostInstallFailed := False;
+  // Retrieve the AppData directory path
+  AppDataDir := ExpandConstant('{userappdata}');
+  PostInstallerExeFilepath := AppDataDir + '\PyMOL-open-source\bin\PostInstallationRunner.exe'
+  MsgBox('Post installer exe filepath: ' + PostInstallerExeFilepath, mbInformation, MB_OK);
 end;
 
 function DoPostInstallTasks: Boolean;
@@ -66,7 +73,7 @@ function DoPostInstallTasks: Boolean;
 begin
   try
     MsgBox('A post installation task needs to be run. This will take around 5 minutes to complete. Press OK to start.', mbInformation, MB_OK);
-    if Exec('C:\ProgramData\IBCI\helpers\PostInstallationRunner.exe', '', '', SW_HIDE, ewWaitUntilTerminated, tmpResultCode) then // Runs PostInstallationRunner!!
+    if Exec(PostInstallerExeFilepath, '', '', SW_HIDE, ewWaitUntilTerminated, tmpResultCode) then // Runs PostInstallationRunner!!
     begin
       // Check the result code of the executed program
       if tmpResultCode <> 0 then
