@@ -143,9 +143,7 @@ public class PyMolComponent : IComponent
     {
         try
         {
-            File.Delete($@"{ConstantPaths.TEMP_DIR}\Pmw-2.1.1.tar.gz");
-            File.Delete($@"{ConstantPaths.TEMP_DIR}\pymol-3.0.0-cp311-cp311-win_amd64.whl");
-            // TODO: Temp directory must be remove!!!
+            Directory.Delete(ConstantPaths.TEMP_DIR, true);
         }
         catch (Exception ex)
         {
