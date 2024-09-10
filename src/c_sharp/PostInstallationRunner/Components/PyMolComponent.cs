@@ -3,29 +3,21 @@ using PostInstallationRunner.Util;
 
 namespace PostInstallationRunner.Components;
 
-public class PyssaComponent : IComponent
+public class PyMolComponent : IComponent
 {
     /// <summary>
-    /// Installs PySSA.
+    /// Installs PyMOL.
     /// </summary>
     /// <returns>
     /// True if installation is successful, otherwise false.
     /// </returns>
     public bool Install()
     {
-        if (!File.Exists(ConstantPaths.WINDOWS_PACKAGE_ZIP))
-        {
-            return false;
-        }
-        if (!UnzipWindowsPackage())
+        if (!SetupPythonEnvironment())
         {
             return false;
         }
         if (!CreateWindowsShortcuts())
-        {
-            return false;
-        }
-        if (!SetupPythonEnvironment())
         {
             return false;
         }
@@ -46,7 +38,7 @@ public class PyssaComponent : IComponent
     {
         // Unzip package definitions
         string zipFilePath = ConstantPaths.WINDOWS_PACKAGE_ZIP;
-        string extractPath = ConstantPaths.PYSSA_PROGRAM_DIR;
+        string extractPath = ConstantPaths.PYMOL_PROGRAM_DIR;
 
         // Ensure the zip archive exists
         if (!File.Exists(zipFilePath))
@@ -85,7 +77,7 @@ public class PyssaComponent : IComponent
     }
 
     /// <summary>
-    /// Creates Windows shortcuts for the PyMOL-PySSA application.
+    /// Creates Windows shortcuts for the PyMOL-open-source application.
     /// </summary>
     /// <returns>0 if the operation is successful, otherwise 1.</returns>
     private bool CreateWindowsShortcuts()
@@ -93,13 +85,12 @@ public class PyssaComponent : IComponent
         try
         {
             // Specify the details for the shortcut to be created
-            string executablePath = ConstantPaths.PYSSA_WINDOW_ARRANGEMENT_EXE_FILEPATH;
-            string shortcutName = "PySSA";
-            string iconPath = ConstantPaths.PYSSA_ICON_FILEPATH;
+            string shortcutName = "PyMOL-open-source";
+            string iconPath = ConstantPaths.PYMOL_ICON_FILEPATH;
             // Create desktop icon
-            SystemEntryHandler.CreateDesktopShortcut(executablePath, shortcutName, iconPath);
+            SystemEntryHandler.CreateDesktopShortcut(ConstantPaths.PYMOL_EXE_FILEPATH, shortcutName, iconPath);
             // Create start menu entry
-            SystemEntryHandler.CreateStartMenuShortcut(executablePath, shortcutName, iconPath);
+            SystemEntryHandler.CreateStartMenuShortcut(ConstantPaths.PYMOL_EXE_FILEPATH, shortcutName, iconPath);
         }
         catch (Exception ex)
         {
@@ -124,11 +115,11 @@ public class PyssaComponent : IComponent
             {
                 return false;
             }
-            if (!tmpPythonUtil.PipWheelInstall($@"{ConstantPaths.PYSSA_PROGRAM_DIR}\Pmw-2.1.1.tar.gz"))
+            if (!tmpPythonUtil.PipWheelInstall($@"{ConstantPaths.TEMP_DIR}\Pmw-2.1.1.tar.gz"))
             {
                 return false;
             }
-            if (!tmpPythonUtil.PipWheelInstall($@"{ConstantPaths.PYSSA_PROGRAM_DIR}\pymol-3.0.0-cp311-cp311-win_amd64.whl"))
+            if (!tmpPythonUtil.PipWheelInstall($@"{ConstantPaths.TEMP_DIR}\pymol-3.0.0-cp311-cp311-win_amd64.whl"))
             {
                 return false;
             }
@@ -152,9 +143,9 @@ public class PyssaComponent : IComponent
     {
         try
         {
-            File.Delete(@"C:\ProgramData\IBCI\PySSA\Pmw-2.1.1.tar.gz");
-            File.Delete(@"C:\ProgramData\IBCI\PySSA\pymol-3.0.0-cp311-cp311-win_amd64.whl");
-            Directory.Delete(@"C:\ProgramData\IBCI\PySSA\bin\setup_python_for_pyssa", true);
+            File.Delete($@"{ConstantPaths.TEMP_DIR}\Pmw-2.1.1.tar.gz");
+            File.Delete($@"{ConstantPaths.TEMP_DIR}\pymol-3.0.0-cp311-cp311-win_amd64.whl");
+            // TODO: Temp directory must be remove!!!
         }
         catch (Exception ex)
         {
@@ -166,20 +157,19 @@ public class PyssaComponent : IComponent
     #endregion
 
     /// <summary>
-    /// Uninstalls PySSA.
+    /// Uninstalls PyMOL-open-source.
     /// </summary>
     /// <returns>
-    /// True if PySSA is successfully uninstalled, otherwise false.
+    /// True if PyMOL-open-source is successfully uninstalled, otherwise false.
     /// </returns>
     public bool Uninstall()
     {
         try
         {
-            string shortcutName = "PySSA";
+            string shortcutName = "PyMOL-open-source";
             SystemEntryHandler.RemoveShortcut(Environment.SpecialFolder.DesktopDirectory, shortcutName);
             SystemEntryHandler.RemoveShortcut(Environment.SpecialFolder.StartMenu, shortcutName);
-            Directory.Delete($@"{ConstantPaths.PYSSA_PROGRAM_DIR}\win_start", true);
-            Directory.Delete(ConstantPaths.PYSSA_PROGRAM_BIN_DIR, true);
+            Directory.Delete(ConstantPaths.PYMOL_PROGRAM_DIR, true);
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -195,14 +185,14 @@ public class PyssaComponent : IComponent
     }
 
     /// <summary>
-    /// Checks if PySSA is installed or not on the system.
+    /// Checks if PYMOL_PROGRAM_DIR is installed or not on the system.
     /// </summary>
     /// <returns>
-    /// True if PySSA is installed, otherwise false.
+    /// True if PYMOL_PROGRAM_DIR is installed, otherwise false.
     /// </returns>
     public bool IsInstalled()
     {
-        if (Directory.Exists(ConstantPaths.PYSSA_PLUGIN_PATH))
+        if (Directory.Exists(ConstantPaths.PYMOL_EXE_FILEPATH))
         {
             return true;
         }

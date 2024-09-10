@@ -15,7 +15,7 @@ AppPublisher=Hannah Kullik
 VersionInfoProductName=PyMOL-open-source
 MinVersion=10.0.19045
 OutputDir=out
-OutputBaseFilename=setup
+OutputBaseFilename=pymol-3_0_0-bin-win64
 ; VersionInfoCopyright=GNU GPL-3.0
 DisableDirPage=True
 DisableProgramGroupPage=True
@@ -37,19 +37,18 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Dirs]
 Name: "{userappdata}\PyMOL-open-source"
 Name: "{userappdata}\PyMOL-open-source\bin"
-Name: "{userappdata}\PyMOL-open-source\tmp"
+Name: "{userappdata}\PyMOL-open-source\temp"
 
 [Files]
-;Source: "src\PostInstallationRunner.exe"; DestDir: "{userappdata}\IBCI\helpers"; Flags: ignoreversion
-;Source: "src\offline_resources\windows_package.zip"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-;Source: "src\offline_resources\alma-colabfold-9-rootfs.tar"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-;Source: "src\offline_resources\ChimeraX-1.8.exe"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-;Source: "src\install.bat"; DestDir: "{userappdata}\IBCI\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-;Source: "src\uninstall.bat"; DestDir: "{userappdata}\IBCI\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs;
-;Source: "src\assets\logo.ico"; DestDir: "{userappdata}\IBCI\PyDD\assets"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\c_sharp\PostInstallationRunner\bin\Release\net8.0\publish\win-x64\PostInstallationRunner.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "..\..\resources\python311\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\..\resources\Pmw-2.1.1.tar.gz"; DestDir: "{app}\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\..\resources\pymol-3.0.0-cp311-cp311-win_amd64.whl"; DestDir: "{app}\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\..\resources\VC_redist.x64.exe"; DestDir: "{app}\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\..\assets\logo.ico"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs;
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{userappdata}\PyMOL-open-source"
+Type: filesandordirs; Name: "{app}"
 
 [Code]
 var 
@@ -57,6 +56,7 @@ var
   PostInstallFailed: Boolean;
   AppDataDir: string;
   PostInstallerExeFilepath: string;
+  PymolExeFilepath: string;
 
 procedure InitializeWizard;
 begin
@@ -65,7 +65,7 @@ begin
   // Retrieve the AppData directory path
   AppDataDir := ExpandConstant('{userappdata}');
   PostInstallerExeFilepath := AppDataDir + '\PyMOL-open-source\bin\PostInstallationRunner.exe'
-  MsgBox('Post installer exe filepath: ' + PostInstallerExeFilepath, mbInformation, MB_OK);
+  PymolExeFilepath := AppDataDir + '\PyMOL-open-source\bin\.venv\Scripts\pymol.exe'
 end;
 
 function DoPostInstallTasks: Boolean;
@@ -111,8 +111,8 @@ begin
     end
     else
     begin
-      MsgBox('The installation was successful. PyDD will now start automatically.', mbInformation, MB_OK);
-      Exec('C:\ProgramData\IBCI\PyDD\win_start\vb_script\window_arrangement.exe', '', '', SW_SHOW, ewNoWait, tmpResultCode)
+      MsgBox('The installation was successful. PyMOL will now start automatically.', mbInformation, MB_OK);
+      Exec(PymolExeFilepath, '', '', SW_SHOW, ewNoWait, tmpResultCode)
     end;
   end;
 end;
