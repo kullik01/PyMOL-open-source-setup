@@ -172,3 +172,5 @@ src/c_sharp/PostInstallationRunner/bin
 src/c_sharp/PostInstallationRunner/obj
 src/c_sharp/PostInstallationRunner/Properties/PublishProfiles/*.user
 src/c_sharp/PostInstallationRunner/*.user
+
+resources

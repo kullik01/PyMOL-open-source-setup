@@ -3,32 +3,7 @@ using System.Diagnostics;
 namespace PostInstallationRunner.Util;
 
 public class PythonUtil
-{
-    public bool InstallPython()
-    {
-        try
-        {
-            Process tmpProcess = new Process
-            {
-                StartInfo =
-                {
-                    FileName = "cmd.exe",
-                    UseShellExecute = false,
-                    CreateNoWindow = Constants.CMD_NO_WINDOW_DEBUG,
-                    Arguments = "/C C:\\ProgramData\\IBCI\\PySSA\\bin\\setup_python_for_pyssa\\setup_python.bat"
-                }
-            };
-            tmpProcess.Start();
-            tmpProcess.WaitForExit();
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-
-        return true;
-    }
-    
+{   
     public bool SetupVenv()
     {
         try
@@ -40,7 +15,7 @@ public class PythonUtil
                     FileName = "cmd.exe",
                     UseShellExecute = false,
                     CreateNoWindow = Constants.CMD_NO_WINDOW_DEBUG,
-                    Arguments = "/C C:\\ProgramData\\IBCI\\PySSA\\bin\\setup_python_for_pyssa\\setup_python.bat"
+                    Arguments = $"/C {ConstantPaths.SETUP_PYTHON_BAT}"
                 }
             };
             tmpProcess.Start();
