@@ -79,4 +79,4 @@ You can cite this software or this repository as it is defined in the CITATION.c
 * Hannah Kullik
 * Martin Urban
 
-** I would like to thank the communities behind the open software libraries, Christoph Gohlke for the wheel files to make the PyMol installation comfortable and especially Warren L. DeLano for their amazing work.**
+** I would like to thank the communities behind the open software libraries, Christoph Gohlke for the wheel files to make the PyMol installation comfortable (and without the hassle of compling PyMOL from source) and especially Warren L. DeLano for their amazing work.**
