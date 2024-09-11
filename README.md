@@ -30,7 +30,7 @@ There are five different Python packages that contain functionality for specific
 
 
 ### Assets
-The <a href="https://github.com/kullik01/PyMOL-open-source-setup/assets">"assets"</a> folder consists which contains the PyMol-open-source logo.
+The <a href="https://github.com/kullik01/PyMOL-open-source-setup/assets">"assets"</a> folder consists which contains the PyMOL-open-source logo.
 
 ## Installation
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
@@ -39,18 +39,12 @@ For a convenient and user-friendly installation follow these steps:
 1. 
 
 ### Source code
-This is a Python project based on a virtual environment. 
+This is a C# project based on a virtual environment. 
 To modify the source code, download or clone the repository 
-and open it in an IDE that supports virtual environments (e.g. PyCharm).
+and open it in an IDE that supports virtual environments (e.g. Rider).
 
 ## Dependencies
-**Managed by PySSA-Installer:**
-* Windows Subsystem for Linux 2
-  * WSL2
-  * License: Microsoft Software License Terms
-* Colabfold
-  * [LocalColabfold](https://github.com/YoshitakaMo/localcolabfold)
-  * License: MIT License
+**Managed by Setup:**
 * [PyQt5](https://riverbankcomputing.com/software/pyqt/intro)
   * License: GNU General Public License (GPL)
 * [NumPy](https://numpy.org/)
@@ -79,4 +73,4 @@ You can cite this software or this repository as it is defined in the CITATION.c
 * Hannah Kullik
 * Martin Urban
 
-** I would like to thank the communities behind the open software libraries, Christoph Gohlke for the wheel files to make the PyMol installation comfortable (and without the hassle of compling PyMOL from source) and especially Warren L. DeLano for their amazing work.**
+** I would like to thank the communities behind the open software libraries, Christoph Gohlke for the wheel files to make the PyMOL installation comfortable (and without the hassle of compling PyMOL from source) and especially Warren L. DeLano for their amazing work.**
