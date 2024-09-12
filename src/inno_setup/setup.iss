@@ -8,7 +8,7 @@
 WizardImageFile=compiler:WizClassicImage.bmp
 AppName=PyMOL-open-source
 AppVersion=3.0.0
-AppCopyright=Hannah Kullik, Martin Urban, Schrodinger LLC
+AppCopyright=Hannah Kullik, Schrodinger LLC
 AppId={{192F52C3-D86D-4735-9929-C7DF593CB534}
 DefaultDirName={userappdata}\PyMOL-open-source
 AppPublisher=Hannah Kullik
