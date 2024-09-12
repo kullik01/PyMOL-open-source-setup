@@ -11,7 +11,6 @@
   * [Sources](#Sources)
   * [Assets](#Assets)
 * [Installation](#Installation)
-    * [Windows](#Windows)
     * [Source code](#Source-code)
 * [Citation](#Citation)
 * [References and useful links](#References-and-useful-links)
@@ -39,9 +38,9 @@ Moreover, the folder includes individual PNG files for each resolution, a genera
 
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">raw</a> subfolder includes the logo in its original vector format as an SVG file.
 
-## Installation
+## Installation for Windows
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
-### Windows
+
 For a convenient and user-friendly installation follow these steps:
 1. 
 
