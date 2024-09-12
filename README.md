@@ -31,7 +31,7 @@ There are five different Python packages that contain functionality for specific
 
 
 ### Assets
-The <a href="https://github.com/kullik01/PyMOL-open-source-setup/assets">"assets"</a> folder consists which contains the PyMOL-open-source logo.
+The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">"assets"</a> folder consists which contains the PyMOL-open-source logo.
 
 ## Installation
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
