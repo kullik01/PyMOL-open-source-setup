@@ -59,6 +59,7 @@ You can cite this software or this repository as it is defined in the CITATION.c
 ## References and useful links
 **PyMOL**
 * [Open-source GitHub repository](https://github.com/schrodinger/pymol-open-source)
+* [Commercial PyMOL](https://pymol.org/)
 * [Open-source Windows Python wheelfiles](https://github.com/cgohlke/pymol-open-source-wheels)
 
 ## Acknowledgements
