@@ -18,8 +18,8 @@
 * [Acknowledgements](#Acknowledgements)
 
 ## Description
-PyMOL-open-source-setup is an open project that 
-aims 
+PyMOL-open-source-setup is an open project which provides a guide for installing the open-source version of PyMOL, a widely-used molecular visualization tool. 
+PyMOL is essential for visualizing and analyzing molecular structures such as proteins, nucleic acids, and small molecules in 3D. This repository focuses on simplifying the setup process for users, enabling them to quickly install and start using the open-source version of PyMOL for research, teaching, or personal use.
 
 ## Contents of this repository
 ### Sources
