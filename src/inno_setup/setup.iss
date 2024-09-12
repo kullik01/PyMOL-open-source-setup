@@ -45,7 +45,7 @@ Source: "..\..\resources\python311\*"; DestDir: "{app}\bin"; Flags: ignoreversio
 Source: "..\..\resources\Pmw-2.1.1.tar.gz"; DestDir: "{app}\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
 Source: "..\..\resources\pymol-3.0.0-cp311-cp311-win_amd64.whl"; DestDir: "{app}\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
 Source: "..\..\resources\VC_redist.x64.exe"; DestDir: "{app}\temp"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "..\..\assets\logo.ico"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\..\assets\convert_to_ico\logo.ico"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs;
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
