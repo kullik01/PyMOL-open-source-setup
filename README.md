@@ -51,13 +51,13 @@ For a convenient and user-friendly installation follow these steps:
 
 4. Agree to the license agreement and click on _Next_.
 
-5. Wait for the installation to finish (This step takes around 1 minute to complete)
+5. Wait for the installation to finish (This step takes around 1 minute to complete).
 
 6. Agree to the Microsoft Software license agreement and click on _Install_.
 
 7. After the installation process of the Microsoft Software click on _Close_.
 
-8. Wait for the installation of PyMOL-open-source-setup to finish (This step takes around ... minutes to complete).
+8. Wait for the installation of PyMOL-open-source-setup to finish (This step takes around 2 minutes to complete).
 
 9. Click on _OK_ and PyMOL will be launched automatically.
 
