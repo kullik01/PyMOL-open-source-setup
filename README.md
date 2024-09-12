@@ -42,7 +42,24 @@ The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/asset
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
 
 For a convenient and user-friendly installation follow these steps:
-1. 
+
+1. Download the _pymol-3_0_0-bin-win64.exe_. Click [here](https://zenodo.org/records/12687296/files/full_pyssa_installer_2024.07.2_setup.zip?download=1) to automatically start the download. The download will take several minutes to download depending on your internet connection.
+
+2. After the download finished open a Windows explorer window and navigate to _Downloads_.
+   
+3. Double-click on the file _pymol-3_0_0-bin-win64.exe_ to start the setup.
+
+4. Agree to the license agreement and click on _Next_.
+
+5. Wait for the installation to finish (This step takes around 1 minute to complete)
+
+6. Agree to the Microsoft Software license agreement and click on _Install_.
+
+7. After the installation process of the Microsoft Software click on _Close_.
+
+8. Wait for the installation of PyMOL-open-source-setup to finish (This step takes around ... minutes to complete).
+
+9. Click on _OK_ and PyMOL will be launched automatically.
 
 **Important:**
 The PyMOL-open-source-setup is unoffical, but was tested by end-user tester.
