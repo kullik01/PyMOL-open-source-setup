@@ -1,8 +1,30 @@
-using System.IO.Compression;
+//
+// PyMOL-open-source-setup
+// Copyright (C) 2024
+// Hannah Kullik (hannah.kullik@studmail.w-hs.de)
+//
+// Source code is available at <https://github.com/kullik01/PyMOL-open-source-setup>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 using PostInstallationRunner.Util;
 
 namespace PostInstallationRunner.Components;
 
+/// <summary>
+/// Represents a class of the PyMOL component.
+/// </summary>
 public class PyMolComponent : IComponent
 {
     /// <summary>
@@ -29,57 +51,10 @@ public class PyMolComponent : IComponent
     }
     
     #region Helper methods
-    
-    /// <summary>
-    /// Unzips the windows_package.zip file to the specified directory.
-    /// </summary>
-    /// <returns>0 if successful, 1 if any error occurs during extraction or file deletion.</returns>
-    private bool UnzipWindowsPackage()
-    {
-        // Unzip package definitions
-        string zipFilePath = ConstantPaths.WINDOWS_PACKAGE_ZIP;
-        string extractPath = ConstantPaths.PYMOL_PROGRAM_DIR;
-
-        // Ensure the zip archive exists
-        if (!File.Exists(zipFilePath))
-        {
-            return false;
-        }
-
-        // Ensure the extract directory exists
-        if (!Directory.Exists(extractPath))
-        {
-            Directory.CreateDirectory(extractPath);
-        }
-
-        // Unzip the archive
-        try
-        {
-            ZipFile.ExtractToDirectory(zipFilePath, extractPath, overwriteFiles: true);
-        }
-        catch (Exception ex)
-        {
-            // Catches error while extracting windows package therefore return 1
-            return false;
-        }
-
-        try
-        {
-            File.Delete(zipFilePath);
-        }
-        catch (Exception ex)
-        {
-            // Catches error while deleting windows package therefore return 1
-            return false;
-        }
-
-        return true;
-    }
-
     /// <summary>
     /// Creates Windows shortcuts for the PyMOL-open-source application.
     /// </summary>
-    /// <returns>0 if the operation is successful, otherwise 1.</returns>
+    /// <returns>True if the operation is successful, otherwise false.</returns>
     private bool CreateWindowsShortcuts()
     {
         try
@@ -94,6 +69,7 @@ public class PyMolComponent : IComponent
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return false;
         }
         
@@ -147,6 +123,7 @@ public class PyMolComponent : IComponent
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return false;
         }
         return true;
@@ -175,7 +152,7 @@ public class PyMolComponent : IComponent
         }
         catch (Exception ex)
         {
-            // Error occured during one of the function calls therefore return false
+            Console.WriteLine(ex);
             return false;
         }
 
@@ -183,17 +160,21 @@ public class PyMolComponent : IComponent
     }
 
     /// <summary>
-    /// Checks if PYMOL_PROGRAM_DIR is installed or not on the system.
+    /// Checks if PyMOL is installed.
     /// </summary>
     /// <returns>
-    /// True if PYMOL_PROGRAM_DIR is installed, otherwise false.
+    /// True if PyMOL is installed, otherwise false.
     /// </returns>
     public bool IsInstalled()
     {
-        if (Directory.Exists(ConstantPaths.PYMOL_EXE_FILEPATH))
+        try
         {
-            return true;
+            return Directory.Exists(ConstantPaths.PYMOL_EXE_FILEPATH);
         }
-        return false;
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return false;
+        }
     }
 }
