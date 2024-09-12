@@ -33,7 +33,7 @@ There are two different packages that contain the functionality of the PyMOL-ope
   - Additionally, the package includes <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/c_sharp.sln">c_sharp.sln</a>, which facilitates the setup and configuration of the working environment.
    
 - _inno_setup_
-  - The package includes the <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/LICENSE.txt">LICENSE.txt</a>file for PyMOL, as well as <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/setup.iss">setup.iss</a>, which pertains to the installation setup for PyMOL-open-source-setup. 
+  - The package includes the <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/LICENSE.txt">LICENSE.txt</a> file for PyMOL, as well as <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/setup.iss">setup.iss</a>, which pertains to the installation setup for PyMOL-open-source-setup. 
 
 ### Assets
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">convert_to_ico</a> 
