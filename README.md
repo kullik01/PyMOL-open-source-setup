@@ -30,14 +30,14 @@ There are five different Python packages that contain functionality for specific
 
 
 ### Assets
-The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">"convert_to_ico"</a> 
-and <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">"raw"</a>. 
+The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">convert_to_ico</a> 
+and <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">raw</a>. 
 
-The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">"convert_to_ico"</a> folder contains a batch script,
+The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">convert_to_ico</a> folder contains a batch script,
 which converts the logo.png image of various resolutions (from 16x16 to 256x256) into a multi-resolution .ico file.
 Moreover, the folder includes individual PNG files for each resolution, a generated logo.ico file, and the original logo.png.
 
-The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">"raw"</a> subfolder includes the logo in its original vector format as an SVG file.
+The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">raw</a> subfolder includes the logo in its original vector format as an SVG file.
 
 ## Installation
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
