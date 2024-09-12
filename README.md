@@ -13,7 +13,6 @@
 * [Installation](#Installation)
     * [Windows](#Windows)
     * [Source code](#Source-code)
-* [Dependencies](#Dependencies)
 * [Citation](#Citation)
 * [References and useful links](#References-and-useful-links)
 * [Acknowledgements](#Acknowledgements)
@@ -40,29 +39,12 @@ For a convenient and user-friendly installation follow these steps:
 1. 
 
 **Important:**
-The PyMOL-open-source-setup is unoffical, but was tested by [End-user tester](#End-user tester).
+The PyMOL-open-source-setup is unoffical, but was tested by end-user tester.
 
 ### Source code
 This is a C# project based on a virtual environment. 
 To modify the source code, download or clone the repository 
 and open it in an IDE that supports virtual environments (e.g. Rider).
-
-## Dependencies
-**Managed by Setup:**
-* [PyQt5](https://riverbankcomputing.com/software/pyqt/intro)
-  * License: GNU General Public License (GPL)
-* [NumPy](https://numpy.org/)
-  * License: BSD 3-Clause "New" or "Revised" License
-* [Pandas](https://github.com/pandas-dev/pandas)
-  * License: BSD 3-Clause "New" or "Revised" License
-* [Matplotlib](https://matplotlib.org/)
-  * License: Python Software Foundation License (PSF)
-* [Biopython](https://biopython.org/)
-  * License: BSD 3-Clause License
-* [PyMOL Open-Source](https://github.com/schrodinger/pymol-open-source)
-  * License: [BSD-like license](https://github.com/schrodinger/pymol-open-source/blob/master/LICENSE)
-* SQLite3
-  * License: [Public Domain](https://www.sqlite.org/copyright.html)
 
 ## Citation
 You can cite this software or this repository as it is defined in the CITATION.cff file.
@@ -73,9 +55,8 @@ You can cite this software or this repository as it is defined in the CITATION.c
 * [Open-source Windows Python wheelfiles](https://github.com/cgohlke/pymol-open-source-wheels)
 
 ## Acknowledgements
-**Developers:**
+**Developer:**
 * Hannah Kullik
-* Martin Urban
 
 **End-user tester:**
 * Martin Urban
