@@ -25,8 +25,8 @@ PyMOL is essential for visualizing and analyzing molecular structures such as pr
 There are two different packages that contain the functionality of the PyMOL-open-source-setup. 
 
 - _c_sharp_
-  - The package comprises the PostInstallationRunner directory.
-    Within the PostInstallationRunner directory, the principal subdirectories are as follows:
+  - The package comprises the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner">PostInstallationRunner</a> directory.
+    Within the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner">PostInstallationRunner</a> directory, the principal subdirectories are as follows:
     - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a>, which contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components/PyMolComponent.cs">PyMolComponent.cs</a>.
     - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a>, which encompasses utility functions relevant to the PyMOL-open-source-setup.
     - Moreover, there is the <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/PostInstallationRunner/Program.cs">Program.cs</a> file, which is relevant for the installation of PyMOL.
@@ -38,9 +38,9 @@ There are two different packages that contain the functionality of the PyMOL-ope
 -------------------------------------------------------
 
 - _c_sharp_
-  - PostInstallationRunner: Contains the core files for post-installation processing.
-    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a> folder: Contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components/PyMolComponent.cs">PyMolComponent.cs</a> file.
-    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a> folder: Contains utility functions relevant to the setup.
+  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner">PostInstallationRunner</a> directory: Contains the core files for post-installation processing.
+    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a> directory: Contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components/PyMolComponent.cs">PyMolComponent.cs</a> file.
+    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a> directory: Contains utility functions relevant to the setup.
     - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/PostInstallationRunner/Program.cs">Program.cs</a> file: Essential for the installation process of PyMOL.
   - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/c_sharp.sln">c_sharp.sln</a> file: Solution file for setting up and configuring the development environment.
    
