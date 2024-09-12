@@ -38,15 +38,15 @@ There are two different packages that contain the functionality of the PyMOL-ope
 -------------------------------------------------------
 
 - _c_sharp_
-  - PostInstallationRunner/: Contains the core files for post-installation processing.
-    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a>: Contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components/PyMolComponent.cs">PyMolComponent.cs</a> file.
-    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a>: Contains utility functions relevant to the setup.
+  - PostInstallationRunner: Contains the core files for post-installation processing.
+    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a> folder: Contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components/PyMolComponent.cs">PyMolComponent.cs</a> file.
+    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a> folder: Contains utility functions relevant to the setup.
     - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/PostInstallationRunner/Program.cs">Program.cs</a> file: Essential for the installation process of PyMOL.
-  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/c_sharp.sln">c_sharp.sln</a>: Solution file for setting up and configuring the development environment.
+  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/c_sharp/c_sharp.sln">c_sharp.sln</a> file: Solution file for setting up and configuring the development environment.
    
 - _inno_setup_
-  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/LICENSE.txt">LICENSE.txt</a>: Contains the license information for PyMOL.
-  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/setup.iss">setup.iss</a>: Script file used for the installation setup of the PyMOL-open-source-setup. 
+  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/LICENSE.txt">LICENSE.txt</a> file: Contains the license information for PyMOL.
+  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/blob/main/src/inno_setup/setup.iss">setup.iss</a> file: Script file used for the installation setup of the PyMOL-open-source-setup. 
 
 ### Assets
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">convert_to_ico</a> 
