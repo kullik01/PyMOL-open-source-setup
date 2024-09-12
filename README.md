@@ -30,7 +30,7 @@ There are five different Python packages that contain functionality for specific
 
 
 ### Assets
-The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">"assets"</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">"convert_to_ico"</a> 
+The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">"convert_to_ico"</a> 
 and <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">"raw"</a>. 
 
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">"convert_to_ico"</a> folder contains a batch script,
