@@ -10,7 +10,7 @@
 * [Contents of this repository](#Contents-of-this-repository)
   * [Sources](#Sources)
   * [Assets](#Assets)
-* [Installation](#Installation)
+* [Installation for Windows OS](#Installation-for-Windows-OS)
     * [Source code](#Source-code)
 * [Citation](#Citation)
 * [References and useful links](#References-and-useful-links)
