@@ -25,11 +25,14 @@ PyMOL is essential for visualizing and analyzing molecular structures such as pr
 There are two different packages that contain the functionality of the PyMOL-open-source-setup. 
 
 - _c_sharp_
-  - The package contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner">PostInstallationRunner</a> folder.
-  - The main subfolders of PostInstallationRunner are <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a>, which includes the PyMolComponent.cs and the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a> directory, which contains utilities for the PyMOL-open-source-setup.
-  - Moreover, it includes the c_sharp.sln for the working install setup.
+  - The package comprises the PostInstallationRunner directory.
+    Within the PostInstallationRunner directory, the principal subdirectories are as follows:
+    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a>, which contains PyMolComponent.cs.
+    - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a>, which encompasses utility functions relevant to the PyMOL-open-source-setup.
+  - Additionally, the package includes c_sharp.sln, which facilitates the setup and configuration of the working environment.
+   
 - _inno_setup_
-  - The package includes the LICENSE.txt of PyMOL and the setup.iss for the PyMOL-open-source-setup.
+  - The package includes the LICENSE.txt file for PyMOL, as well as setup.iss, which pertains to the installation setup for PyMOL-open-source-setup. 
 
 ### Assets
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">convert_to_ico</a> 
