@@ -22,11 +22,14 @@ PyMOL is essential for visualizing and analyzing molecular structures such as pr
 
 ## Contents of this repository
 ### Sources
-There are five different Python packages that contain functionality for specific aspects of the architecture. 
+There are two different packages that contain the functionality of the PyMOL-open-source-setup. 
 
-- _pyssa_ 
-  - The package contains Python modules, Qt .ui files and cascading stylesheets.
-
+- _c_sharp_
+  - The package contains the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner">PostInstallationRunner</a> folder.
+  - The main subfolders of PostInstallationRunner are <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Components">Components</a>, which includes the PyMolComponent.cs and the <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/src/c_sharp/PostInstallationRunner/Util">Util</a> directory, which contains utilities for the PyMOL-open-source-setup.
+  - Moreover, it includes the c_sharp.sln for the working install setup.
+- _inno_setup_
+  - The package includes the LICENSE.txt of PyMOL and the setup.iss for the PyMOL-open-source-setup.
 
 ### Assets
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets">assets</a> folder consists of the subfolders <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/convert_to_ico">convert_to_ico</a> 
@@ -38,7 +41,7 @@ Moreover, the folder includes individual PNG files for each resolution, a genera
 
 The <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">raw</a> subfolder includes the logo in its original vector format as an SVG file.
 
-## Installation for Windows
+## Installation for Windows OS
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
 
 For a convenient and user-friendly installation follow these steps:
