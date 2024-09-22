@@ -48,31 +48,13 @@ There are two different directories used for images.
 which converts the logo.png image into various resolutions (from 16x16 to 256x256) PNG files and a multi-resolution ICO file.
 Moreover, the directory includes individual PNG files for each resolution, a generated logo.ico file, and the original logo.png.
   - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/raw">raw</a> directory: Includes the logo in its original vector format as an SVG file.
+  - <a href="https://github.com/kullik01/PyMOL-open-source-setup/tree/main/assets/wiki_images">wiki_images</a> directory: Contains images for wiki.
 
 ## Installation for Windows OS
 PyMOL-open-source-setup is tested and available for Windows 10 and 11.
 To be able to run PyMOL, the **[Microsoft Visual C++ Redistributable packages for Visual Studio 2022](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170)** are **required**.
 The installation of these packages can be carried out during the installation process, when prompted by the setup.
-
-For a convenient and user-friendly installation follow these steps:
-
-1. Download the _pymol-3_0_0-bin-win64.exe_. Click [here](https://zenodo.org/records/12687296/files/full_pyssa_installer_2024.07.2_setup.zip?download=1) to automatically start the download. The download will take several minutes to download depending on your internet connection.
-
-2. After the download finished open a Windows explorer window and navigate to _Downloads_.
-   
-3. Double-click on the file _pymol-3_0_0-bin-win64.exe_ to start the setup.
-
-4. Agree to the license agreement and click on _Next_.
-
-5. Wait for the installation to finish (This step takes around 1 minute to complete).
-
-6. Agree to the Microsoft software license agreement and click on _Install_.
-
-7. After the installation process of the Microsoft software package click on _Close_.
-
-8. Wait for the installation of PyMOL-open-source-setup to finish (This step takes around 2 minutes to complete).
-
-9. Click on _OK_ and PyMOL will be launched automatically.
+For a convenient and user-friendly installation click [here](https://github.com/kullik01/PyMOL-open-source-setup/wiki/Installation-for-Windows-Operating-System)
 
 ### Source code
 To modify the source code, download or clone the repository.
