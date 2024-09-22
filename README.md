@@ -55,7 +55,7 @@ PyMOL-open-source-setup is tested and available for Windows 10 and 11.
 To be able to run PyMOL, the **[Microsoft Visual C++ Redistributable packages for Visual Studio 2022](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170)** are **required**.
 The installation of these packages can be carried out during the installation process, when prompted by the setup.
 
-For a convenient and user-friendly installation click [here](https://github.com/kullik01/PyMOL-open-source-setup/wiki/Installation-for-Windows-Operating-System)
+For a convenient and user-friendly installation click [here](https://github.com/kullik01/PyMOL-open-source-setup/wiki/Installation-for-Windows-Operating-System).
 
 ### Source code
 To modify the source code, download or clone the repository.
