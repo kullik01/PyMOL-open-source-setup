@@ -41,8 +41,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip'
-          cache-dependency-path: 'os_specific/windows/requirements.txt'
+          cache: 'none'
 
       - name: Extract project version
         shell: bash

@@ -51,7 +51,7 @@ import subprocess
 import sys
 import sysconfig
 import textwrap
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable
 
 # <editor-fold desc="pymake">
 # <editor-fold desc="Type aliases">
@@ -65,7 +65,7 @@ _PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
 # <editor-fold desc="Module-level task registry">
 # Maps task name → registered callable.  Insertion order is preserved (Python
 # 3.7+) so the help menu reflects the order tasks are declared in the file.
-_TASKS: Dict[str, _TaskFunc] = {}
+_TASKS: dict[str, _TaskFunc] = {}
 # </editor-fold>
 
 # <editor-fold desc="ANSI color helpers">
@@ -137,9 +137,9 @@ def run(
         *,
         check: bool = True,
         capture: bool = False,
-        env: Optional[Dict[str, str]] = None,
-        cwd: Optional[pathlib.Path] = None,
-) -> Optional[str]:
+        env: dict[str, str] | None = None,
+        cwd: pathlib.Path | None = None,
+) -> str | None:
   """Executes a shell command, printing it to stdout before running.
 
   This helper is the primary interface for invoking external processes from
@@ -200,13 +200,13 @@ def run(
   return None
 
 
-def _run_process(args: List[str], *, cwd: Optional[pathlib.Path] = None) -> None:
+def _run_process(args: list[str], *, cwd: pathlib.Path | None = None) -> None:
   """Runs an executable with an argument list and fails on errors."""
   print(_colorize(f"$ {shlex.join(args)}", _COLOR_GREY))
   subprocess.run(args, check=True, cwd=cwd)
 
 
-def _platform_build_paths() -> Tuple[pathlib.Path, pathlib.Path, str]:
+def _platform_build_paths() -> tuple[pathlib.Path, pathlib.Path, str]:
   """Returns the platform directory, PyMOL package, and build command."""
   system = platform.system()
   if system == "Windows":
@@ -357,7 +357,7 @@ def build_inno_setup(architecture: str = "x64") -> None:
   _run_process(compiler_args)
 
 
-def _parse_args(argv: List[str]) -> Tuple[List[str], Dict[str, str]]:
+def _parse_args(argv: list[str]) -> tuple[list[str], dict[str, str]]:
   """Splits a list of CLI tokens into positional args and keyword args.
 
   Keyword arguments may be supplied in any of the following formats::
@@ -382,8 +382,8 @@ def _parse_args(argv: List[str]) -> Tuple[List[str], Dict[str, str]]:
       >>> _parse_args(["--env=prod", "extra"])
       (['extra'], {'env': 'prod'})
   """
-  positional: List[str] = []
-  keyword: Dict[str, str] = {}
+  positional: list[str] = []
+  keyword: dict[str, str] = {}
 
   for token in argv:
     if "=" in token:
@@ -407,7 +407,7 @@ def _build_help_text() -> str:
   Returns:
       A multi-line string ready to be printed to stdout.
   """
-  lines: List[str] = [
+  lines: list[str] = [
     "",
     _colorize("Available tasks", _COLOR_GREEN),
     _colorize("=" * 60, _COLOR_GREY),
@@ -418,7 +418,7 @@ def _build_help_text() -> str:
     params = list(sig.parameters.values())
 
     # Build a compact parameter hint, e.g. ``[env=dev] [verbose=false]``.
-    param_hints: List[str] = []
+    param_hints: list[str] = []
     for param in params:
       if param.default is inspect.Parameter.empty:
         param_hints.append(f"<{param.name}>")
@@ -610,7 +610,7 @@ def test(match: str = "", verbose: str = "false") -> None:
       ./pymake.bat/sh test verbose=true          # Verbose output.
       ./pymake.bat/sh test match=api verbose=true
   """
-  cmd_parts: List[str] = ["pytest"]
+  cmd_parts: list[str] = ["pytest"]
   if verbose.lower() == "true":
     cmd_parts.append("-v")
   if match:

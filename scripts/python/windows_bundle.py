@@ -64,6 +64,14 @@ class BundleConfig:
 
 
 def _sha256(path: Path) -> str:
+    """Compute the SHA-256 digest of a file.
+
+    Args:
+        path: File to hash.
+
+    Returns:
+        Lowercase hexadecimal digest.
+    """
     digest = hashlib.sha256()
     with path.open("rb") as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
@@ -72,14 +80,29 @@ def _sha256(path: Path) -> str:
 
 
 def runtime_url(version: str) -> str:
-    """Returns the approved CPython archive URL or rejects another version."""
+    """Return the approved CPython archive URL or reject another version.
+
+    Args:
+        version: Requested CPython version.
+
+    Returns:
+        Approved runtime archive URL.
+    """
     if version != RUNTIME_VERSION:
         raise ValueError(f"Only CPython {RUNTIME_VERSION} is approved")
     return RUNTIME_URL
 
 
 def _download_runtime_archive(version: str, destination: Path) -> str:
-    """Downloads and verifies the approved runtime archive."""
+    """Download and verify the approved runtime archive.
+
+    Args:
+        version: Approved CPython version.
+        destination: Destination archive path.
+
+    Returns:
+        SHA-256 digest of the downloaded archive.
+    """
     request = urllib.request.Request(
         runtime_url(version), headers={"User-Agent": "pymol-open-source-bundler"}
     )
@@ -97,7 +120,12 @@ def _download_runtime_archive(version: str, destination: Path) -> str:
 
 
 def _extract_runtime_archive(archive: Path, runtime: Path) -> None:
-    """Extracts the already-verified runtime archive into the bundle."""
+    """Extract the already-verified runtime archive into the bundle.
+
+    Args:
+        archive: Verified runtime archive.
+        runtime: Runtime extraction directory.
+    """
     runtime.mkdir(parents=True, exist_ok=True)
     with tarfile.open(archive, "r:gz") as source:
         members = source.getmembers()
@@ -112,7 +140,14 @@ def _extract_runtime_archive(archive: Path, runtime: Path) -> None:
 
 
 def _provenance(root: Path) -> tuple[str, str]:
-    """Returns provenance only for a clean worktree with an authoritative HEAD."""
+    """Return provenance for a clean worktree with an authoritative HEAD.
+
+    Args:
+        root: Repository root.
+
+    Returns:
+        Git commit and reproducible build timestamp.
+    """
     try:
         status = subprocess.check_output(
             [
@@ -153,7 +188,14 @@ def _provenance(root: Path) -> tuple[str, str]:
 
 
 def _timestamp_from_source_date_epoch(value: str) -> str:
-    """Converts a validated reproducible-build epoch to an ISO timestamp."""
+    """Convert a reproducible-build epoch to an ISO timestamp.
+
+    Args:
+        value: Non-negative decimal epoch string.
+
+    Returns:
+        ISO-8601 timestamp.
+    """
     value = value.strip()
     if not value.isdigit():
         raise RuntimeError("SOURCE_DATE_EPOCH must be a non-negative integer")
@@ -164,7 +206,14 @@ def _timestamp_from_source_date_epoch(value: str) -> str:
 
 
 def _commit_timestamp(root: Path) -> str:
-    """Returns the authoritative ISO timestamp recorded on Git HEAD."""
+    """Return the authoritative ISO timestamp recorded on Git HEAD.
+
+    Args:
+        root: Repository root.
+
+    Returns:
+        Commit timestamp including timezone.
+    """
     try:
         timestamp = subprocess.check_output(
             ["git", "-C", str(root), "show", "-s", "--format=%cI", "HEAD"],
@@ -184,7 +233,14 @@ def _commit_timestamp(root: Path) -> str:
 
 
 def overlay_inventory(root: Path) -> dict[Path, Path]:
-    """Returns the existing repository overlays and their bundle targets."""
+    """Return repository overlays and their bundle targets.
+
+    Args:
+        root: Repository root.
+
+    Returns:
+        Mapping from overlay source paths to bundle-relative targets.
+    """
     return {
         root / "edited/pmg_qt/pymol_qt_gui.py": Path(
             "runtime/python/Lib/site-packages/pmg_qt/pymol_qt_gui.py"
@@ -208,6 +264,14 @@ def overlay_inventory(root: Path) -> dict[Path, Path]:
 
 
 def _find_python(runtime: Path) -> Path:
+    """Find the shortest-path Python executable in a runtime tree.
+
+    Args:
+        runtime: Extracted runtime directory.
+
+    Returns:
+        Python executable path.
+    """
     candidates = sorted(runtime.rglob("python.exe"))
     if not candidates:
         raise FileNotFoundError("Standalone runtime did not contain python.exe")
@@ -215,10 +279,22 @@ def _find_python(runtime: Path) -> Path:
 
 
 def _run(args: Iterable[str], cwd: Path) -> None:
+    """Run a checked subprocess in a working directory.
+
+    Args:
+        args: Executable and argument sequence.
+        cwd: Subprocess working directory.
+    """
     subprocess.run(list(args), check=True, cwd=cwd)
 
 
 def _write_launcher(output: Path, python_exe: Path) -> None:
+    """Write the relative launcher used by the bundle.
+
+    Args:
+        output: Bundle output directory.
+        python_exe: Runtime Python executable.
+    """
     runtime_path = python_exe.relative_to(output).as_posix().replace("/", "\\")
     (output / "launch_pymol.cmd").write_text(
         "@echo off\r\n"
@@ -238,6 +314,15 @@ def _write_manifest(
     git_commit: str,
     timestamp: str,
 ) -> None:
+    """Write bundle dependency and provenance metadata.
+
+    Args:
+        config: Bundle build configuration.
+        python_exe: Runtime Python executable.
+        runtime_archive_sha256: Verified runtime archive digest.
+        git_commit: Authoritative source commit.
+        timestamp: Reproducible build timestamp.
+    """
     lock_hash = _sha256(config.lockfile)
     lock = tomllib.loads(config.lockfile.read_text(encoding="utf-8"))
     dependency_sources = _locked_dependency_sources(lock)
@@ -265,7 +350,14 @@ def _write_manifest(
 
 
 def _valid_hash(value: object) -> bool:
-    """Returns whether a manifest value is a SHA-256 digest."""
+    """Return whether a manifest value is a SHA-256 digest.
+
+    Args:
+        value: Candidate manifest value.
+
+    Returns:
+        Whether the value is a valid hexadecimal SHA-256 digest.
+    """
     if not isinstance(value, str):
         return False
     digest = value.removeprefix("sha256:")
@@ -275,7 +367,14 @@ def _valid_hash(value: object) -> bool:
 
 
 def _locked_dependency_sources(lock: dict) -> dict[str, list[dict[str, str]]]:
-    """Returns the locked artifacts for every approved runtime dependency."""
+    """Return locked artifacts for approved runtime dependencies.
+
+    Args:
+        lock: Decoded lockfile contents.
+
+    Returns:
+        Mapping from package names to locked artifact metadata.
+    """
     package_names = {
         package.split("==", 1)[0].lower().replace("_", "-")
         for package in RUNTIME_PACKAGES
@@ -312,7 +411,11 @@ def _locked_dependency_sources(lock: dict) -> dict[str, list[dict[str, str]]]:
 
 
 def _invalidate_output(path: Path) -> None:
-    """Removes a prior output so failed packaging cannot look successful."""
+    """Remove prior output so failed packaging cannot look successful.
+
+    Args:
+        path: Output path to remove.
+    """
     if path.is_dir() and not path.is_symlink():
         shutil.rmtree(path)
     elif path.exists() or path.is_symlink():
@@ -320,7 +423,12 @@ def _invalidate_output(path: Path) -> None:
 
 
 def _validate_bundle(bundle: Path, config: BundleConfig | None = None) -> None:
-    """Validates that ``bundle`` is the approved self-contained bundle shape."""
+    """Validate that ``bundle`` has the approved self-contained shape.
+
+    Args:
+        bundle: Bundle directory to validate.
+        config: Optional build configuration supplying provenance paths.
+    """
     if not bundle.is_dir():
         raise FileNotFoundError(f"Windows x86_64 bundle is missing: {bundle}")
     missing = [
@@ -433,7 +541,13 @@ def _validate_bundle(bundle: Path, config: BundleConfig | None = None) -> None:
 def create_deterministic_archive(
     bundle: Path, archive: Path, config: BundleConfig | None = None
 ) -> None:
-    """Creates a byte-stable ZIP archive from a validated bundle."""
+    """Create a byte-stable ZIP archive from a validated bundle.
+
+    Args:
+        bundle: Validated bundle directory.
+        archive: Destination ZIP path.
+        config: Optional build configuration supplying provenance paths.
+    """
     _invalidate_output(archive)
     _validate_bundle(bundle, config)
     archive.parent.mkdir(parents=True, exist_ok=True)
@@ -465,7 +579,14 @@ def prepare_inno_staging(
     logo: Path,
     config: BundleConfig | None = None,
 ) -> None:
-    """Stages the validated bundle and installer asset for the x64 script."""
+    """Stage the validated bundle and installer asset for the x64 script.
+
+    Args:
+        bundle: Validated bundle directory.
+        staging: Installer staging directory.
+        logo: Inno Setup logo path.
+        config: Optional build configuration supplying provenance paths.
+    """
     _invalidate_output(staging)
     _validate_bundle(bundle, config)
     if not logo.is_file():
@@ -492,7 +613,12 @@ def prepare_inno_staging(
 
 
 def _copy_overlays(root: Path, output: Path) -> None:
-    """Copies every approved overlay and fails on a missing source."""
+    """Copy every approved overlay and fail on a missing source.
+
+    Args:
+        root: Repository root.
+        output: Bundle output directory.
+    """
     for source, relative_target in overlay_inventory(root).items():
         if not source.is_file():
             raise FileNotFoundError(f"Missing required overlay: {source}")
@@ -502,7 +628,11 @@ def _copy_overlays(root: Path, output: Path) -> None:
 
 
 def build(config: BundleConfig) -> None:
-    """Builds a bundle and removes all output if any prerequisite fails."""
+    """Build a bundle and remove output if any prerequisite fails.
+
+    Args:
+        config: Bundle build configuration.
+    """
     _invalidate_output(config.output)
     try:
         _build(config)
@@ -512,7 +642,11 @@ def build(config: BundleConfig) -> None:
 
 
 def _build(config: BundleConfig) -> None:
-    """Assembles the offline bundle using uv and the committed lockfile."""
+    """Assemble the offline bundle using uv and the committed lockfile.
+
+    Args:
+        config: Bundle build configuration.
+    """
     if platform.system() != "Windows" or platform.machine().lower() not in {
         "amd64",
         "x86_64",

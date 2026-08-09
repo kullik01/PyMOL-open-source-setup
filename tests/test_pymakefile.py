@@ -1,3 +1,5 @@
+"""Tests for the pymake tasks and Windows bundle helpers."""
+
 import io
 import hashlib
 import json
@@ -16,7 +18,14 @@ from scripts.python import windows_bundle
 
 
 def _make_valid_bundle(root: Path) -> Path:
-  """Creates the minimum build-produced bundle shape for packaging tests."""
+  """Create the minimum build-produced bundle shape for packaging tests.
+
+  Args:
+    root: Temporary directory receiving the bundle.
+
+  Returns:
+    Path to the valid test bundle.
+  """
   bundle = root / "bundle"
   for relative in windows_bundle._REQUIRED_BUNDLE_CONTENT:
     path = bundle / relative
@@ -46,13 +55,16 @@ def _make_valid_bundle(root: Path) -> Path:
 
 
 class PymakeBuildTaskTest(unittest.TestCase):
+  """Verify task dispatch, bundling, and packaging behavior."""
 
   def test_runtime_url_rejects_unapproved_version(self) -> None:
+    """Reject runtime versions outside the approved version."""
     self.assertIn("3.11.15", windows_bundle.runtime_url("3.11.15"))
     with self.assertRaises(ValueError):
       windows_bundle.runtime_url("3.12.0")
 
   def test_runtime_archive_hashes_downloaded_bytes(self) -> None:
+    """Hash downloaded runtime bytes before accepting the archive."""
     response = mock.MagicMock()
     response.__enter__.return_value = io.BytesIO(b"archive")
     with tempfile.TemporaryDirectory() as temporary_directory:
@@ -75,6 +87,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     )
 
   def test_changed_runtime_archive_fails_verification(self) -> None:
+    """Reject an archive whose bytes do not match the approved hash."""
     response = mock.MagicMock()
     response.__enter__.return_value = io.BytesIO(b"changed")
     with tempfile.TemporaryDirectory() as temporary_directory:
@@ -88,6 +101,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
           )
 
   def test_verified_archive_content_becomes_installed_runtime(self) -> None:
+    """Extract verified archive members into the runtime directory."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       source = root / "python.exe"
@@ -102,6 +116,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       )
 
   def test_runtime_archive_rejects_links(self) -> None:
+    """Reject symbolic and hard links in runtime archives."""
     for member_type in (tarfile.SYMTYPE, tarfile.LNKTYPE):
       with self.subTest(member_type=member_type), tempfile.TemporaryDirectory() as temporary_directory:
         root = Path(temporary_directory)
@@ -115,6 +130,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
           windows_bundle._extract_runtime_archive(archive, root / "installed")
 
   def test_manifest_records_archive_and_required_provenance(self) -> None:
+    """Record archive, Git, timestamp, and dependency provenance."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       lockfile = pymakefile._PROJECT_ROOT / "uv.lock"
@@ -143,6 +159,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     )
 
   def test_volatile_ci_metadata_does_not_change_archive_bytes(self) -> None:
+    """Keep archive bytes stable when volatile CI metadata changes."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = _make_valid_bundle(root)
@@ -191,6 +208,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(first_archive, second_archive)
 
   def test_provenance_fails_when_git_is_unavailable(self) -> None:
+    """Reject builds when Git provenance cannot be read."""
     with mock.patch.dict("os.environ", {}, clear=True), mock.patch(
         "scripts.python.windows_bundle.subprocess.check_output",
         side_effect=FileNotFoundError,
@@ -199,6 +217,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle._provenance(Path("root"))
 
   def test_provenance_accepts_clean_worktree(self) -> None:
+    """Accept provenance from a clean worktree."""
     with mock.patch.object(
         windows_bundle.subprocess,
         "check_output",
@@ -208,6 +227,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(commit, "head")
 
   def test_provenance_is_stable_and_honors_source_date_epoch(self) -> None:
+    """Produce stable provenance and honor the source-date epoch."""
     with mock.patch.object(
         windows_bundle.subprocess,
         "check_output",
@@ -233,6 +253,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(timestamp, "2026-08-09T00:00:00+00:00")
 
   def test_provenance_rejects_invalid_source_date_epoch(self) -> None:
+    """Reject malformed source-date epoch values."""
     with mock.patch.dict("os.environ", {"SOURCE_DATE_EPOCH": "not-an-epoch"}, clear=True), mock.patch.object(
         windows_bundle.subprocess,
         "check_output",
@@ -242,6 +263,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle._provenance(Path("root"))
 
   def test_provenance_rejects_dirty_tracked_worktree(self) -> None:
+    """Reject a worktree containing tracked changes."""
     with mock.patch.object(
         windows_bundle.subprocess,
         "check_output",
@@ -252,6 +274,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(check_output.call_count, 1)
 
   def test_provenance_rejects_untracked_worktree(self) -> None:
+    """Reject a worktree containing untracked files."""
     with mock.patch.object(
         windows_bundle.subprocess,
         "check_output",
@@ -261,6 +284,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle._provenance(Path("root"))
 
   def test_provenance_accepts_matching_override(self) -> None:
+    """Accept a Git commit override matching HEAD."""
     with mock.patch.dict("os.environ", {"GIT_COMMIT": "head"}, clear=True), mock.patch(
         "scripts.python.windows_bundle.subprocess.check_output",
         side_effect=["", "head\n", "2026-08-09T00:00:00+00:00\n"],
@@ -269,6 +293,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(commit, "head")
 
   def test_provenance_rejects_conflicting_override(self) -> None:
+    """Reject a Git commit override that conflicts with HEAD."""
     with mock.patch.dict("os.environ", {"GIT_COMMIT": "stale"}, clear=True), mock.patch(
         "scripts.python.windows_bundle.subprocess.check_output",
         side_effect=["", "head\n"],
@@ -277,6 +302,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle._provenance(Path("root"))
 
   def test_build_removes_stale_output_when_uv_is_missing(self) -> None:
+    """Remove stale output when uv is unavailable."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       output = root / "bundle"
@@ -291,6 +317,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertFalse(output.exists())
 
   def test_build_removes_output_when_runtime_download_fails(self) -> None:
+    """Remove output when runtime download fails."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       output = root / "bundle"
@@ -306,6 +333,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertFalse(output.exists())
 
   def test_runtime_discovery_prefers_top_level_interpreter(self) -> None:
+    """Prefer the shortest-path runtime interpreter."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       runtime = Path(temporary_directory)
       top_level = runtime / "python.exe"
@@ -316,6 +344,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertEqual(windows_bundle._find_python(runtime), top_level)
 
   def test_missing_overlay_fails_before_copy(self) -> None:
+    """Fail before copying when an overlay source is missing."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       output = root / "bundle"
@@ -324,6 +353,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle._copy_overlays(root, output)
 
   def test_build_sequences_runtime_dependencies_overlays_and_manifest(self) -> None:
+    """Build runtime, dependencies, overlays, launcher, and manifest in order."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       output = root / "bundle"
@@ -365,6 +395,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertIn("--require-hashes", sync_command)
 
   def test_windows_bundle_task_delegates_on_windows(self) -> None:
+    """Delegate the bundle task to the bundle builder on Windows."""
     with mock.patch.object(
         pymakefile.platform, "system", return_value="Windows"
     ), mock.patch("scripts.python.windows_bundle.build") as build:
@@ -372,11 +403,13 @@ class PymakeBuildTaskTest(unittest.TestCase):
     build.assert_called_once()
 
   def test_windows_artifact_task_guards_platform(self) -> None:
+    """Reject Windows artifact builds on other platforms."""
     with mock.patch.object(pymakefile.platform, "system", return_value="Linux"):
       with self.assertRaisesRegex(RuntimeError, "only supported on Windows"):
         pymakefile.build_windows_artifacts()
 
   def test_windows_artifact_task_orders_bundle_zip_and_installer(self) -> None:
+    """Build the bundle, ZIP, and installer in the required order."""
     calls = []
     with mock.patch.object(pymakefile.platform, "system", return_value="Windows"), \
         mock.patch.object(pymakefile, "build_windows_bundle", side_effect=lambda: calls.append("bundle")), \
@@ -386,6 +419,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(calls, ["bundle", "zip", "x64"])
 
   def test_overlay_inventory_preserves_required_files(self) -> None:
+    """Keep all required overlay sources and target locations."""
     inventory = windows_bundle.overlay_inventory(Path("root"))
     self.assertEqual(len(inventory), 6)
     self.assertEqual(
@@ -401,6 +435,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertNotIn(Path("Lib/site-packages/pymol/base.css"), inventory.values())
 
   def test_rebuild_removes_stale_root_level_overlay_output(self) -> None:
+    """Remove stale root-level overlays before rebuilding."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       output = root / "bundle"
@@ -417,6 +452,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle.build(config)
 
   def test_launcher_is_relative(self) -> None:
+    """Write a launcher that uses the bundle-relative runtime path."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       output = Path(temporary_directory)
       windows_bundle._write_launcher(output, output / "runtime/python.exe")
@@ -428,6 +464,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertNotIn(str(output), launcher)
 
   def test_archive_is_deterministic_and_contains_bundle_identity(self) -> None:
+    """Create identical archives containing the complete bundle."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = _make_valid_bundle(root)
@@ -450,6 +487,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         )
 
   def test_archive_rejects_installer_and_cx_freeze_contents(self) -> None:
+    """Reject installer and cx_Freeze markers in portable archives."""
     for filename in ("VC_redist.x64.exe", "library.zip", "Open-Source-PyMOL.exe"):
       with self.subTest(filename=filename), tempfile.TemporaryDirectory() as temporary_directory:
         bundle = _make_valid_bundle(Path(temporary_directory))
@@ -460,6 +498,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
           )
 
   def test_inno_staging_reuses_bundle_and_rejects_missing_bundle(self) -> None:
+    """Stage valid bundles and reject missing or unsafe bundles."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = _make_valid_bundle(root)
@@ -478,6 +517,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         windows_bundle.prepare_inno_staging(bundle, staging, logo)
 
   def test_packaging_rejects_missing_runtime_and_incomplete_manifest(self) -> None:
+    """Reject missing runtime files and incomplete manifests."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = _make_valid_bundle(root)
@@ -500,6 +540,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertFalse(staging.exists())
 
   def test_packaging_rejects_each_missing_overlay(self) -> None:
+    """Reject every bundle missing one required overlay."""
     overlay_targets = tuple(windows_bundle.overlay_inventory(Path("root")).values())
     for target in overlay_targets:
       with self.subTest(target=target), tempfile.TemporaryDirectory() as temporary_directory:
@@ -520,6 +561,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         self.assertFalse(staging.exists())
 
   def test_packaging_rejects_stale_root_level_overlays(self) -> None:
+    """Reject stale overlays placed at the bundle root."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = _make_valid_bundle(root)
@@ -540,6 +582,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertFalse(staging.exists())
 
   def test_packaging_rejects_provenance_and_lock_mutations(self) -> None:
+    """Reject mutations to runtime, lock, and dependency provenance."""
     mutations = (
         ("runtime hash", lambda manifest: manifest["runtime"].update(
             sha256="0" * 64
@@ -574,6 +617,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
         self.assertFalse(staging.exists())
 
   def test_packaging_rejects_stale_git_commit_and_timestamp(self) -> None:
+    """Reject stale Git commit and timestamp metadata."""
     for field, value in (("git_commit", "0" * 40), ("timestamp", "stale")):
       with self.subTest(field=field), tempfile.TemporaryDirectory() as temporary_directory:
         root = Path(temporary_directory)
@@ -585,6 +629,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
           windows_bundle.create_deterministic_archive(bundle, root / "bundle.zip")
 
   def test_x64_inno_script_contract(self) -> None:
+    """Verify the x64 Inno Setup script contract."""
     script = (
         pymakefile._PROJECT_ROOT / "os_specific/windows/inno_setup/setup_x64.iss"
     ).read_text(encoding="utf-8")
@@ -594,6 +639,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertNotIn("[Run]", script)
 
   def test_workflow_artifact_uploads_fail_on_missing_files(self) -> None:
+    """Require workflow artifact uploads to fail on missing files."""
     workflow = (
         pymakefile._PROJECT_ROOT / ".github/workflows/build_app.yaml"
     ).read_text(encoding="utf-8")
@@ -690,6 +736,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertNotIn("Compile .iss file", workflow)
 
   def test_windows_docs_and_uv_workflow_pin_match_supported_flow(self) -> None:
+    """Keep Windows documentation and workflow pins aligned."""
     workflow = (
         pymakefile._PROJECT_ROOT / ".github/workflows/build_app.yaml"
     ).read_text(encoding="utf-8")
@@ -754,6 +801,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertNotIn(".\\pymake.bat build_windows_bundle", poc)
 
   def test_platform_build_paths(self) -> None:
+    """Resolve platform-specific build paths and commands."""
     with mock.patch.object(pymakefile.platform, "system", return_value="Darwin"):
       with mock.patch.object(
           pymakefile.sysconfig,
@@ -772,6 +820,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertEqual(build_command, "bdist_mac")
 
   def test_build_app_copies_customizations_and_artifacts(self) -> None:
+    """Copy customizations and built artifacts into the application tree."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       package_dir = root / "venv/lib/python3.11/site-packages/pymol"
@@ -815,6 +864,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertEqual(run_process.call_args.kwargs["cwd"], root / "os_specific/linux")
 
   def test_prepare_inno_setup_uses_bundle_staging_tree(self) -> None:
+    """Prepare Inno Setup staging from an existing bundle."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = root / "dist/windows-x86_64-bundle"
@@ -849,6 +899,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertTrue((staging / "inno-assets/logo.ico").exists())
 
   def test_package_task_uses_existing_bundle_without_rebuild(self) -> None:
+    """Package an existing bundle without rebuilding it."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       bundle = root / "dist/windows-x86_64-bundle"
@@ -868,6 +919,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       )
 
   def test_prepare_inno_setup_requires_bundle(self) -> None:
+    """Require a bundle before preparing Inno Setup staging."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       (root / "os_specific/windows").mkdir(parents=True)
@@ -879,6 +931,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
           pymakefile.prepare_inno_setup()
 
   def test_old_x86_inno_preparation_remains_available(self) -> None:
+    """Preserve the legacy x86 staging helper behavior."""
     with tempfile.TemporaryDirectory() as temporary_directory:
       root = Path(temporary_directory)
       app_build = root / f"dist/exe.win-amd64-{sys.version_info.major}.{sys.version_info.minor}"
@@ -901,11 +954,13 @@ class PymakeBuildTaskTest(unittest.TestCase):
       self.assertTrue((staging / "inno-assets/logo.ico").exists())
 
   def test_build_inno_setup_rejects_unknown_architecture(self) -> None:
+    """Reject unsupported installer architectures."""
     with mock.patch.object(pymakefile.platform, "system", return_value="Windows"):
       with self.assertRaises(ValueError):
         pymakefile.build_inno_setup("arm64")
 
   def test_build_inno_setup_rejects_retired_x86_before_build_work(self) -> None:
+    """Reject retired x86 builds before invoking build steps."""
     with mock.patch.object(
         pymakefile.platform, "system", return_value="Windows"
     ), mock.patch.object(
@@ -923,6 +978,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     which.assert_not_called()
 
   def test_run_accepts_explicit_working_directory(self) -> None:
+    """Pass an explicit working directory to subprocess execution."""
     with mock.patch.object(pymakefile.subprocess, "run") as run_process:
       pymakefile.run("pytest", cwd=pymakefile._PROJECT_ROOT)
 

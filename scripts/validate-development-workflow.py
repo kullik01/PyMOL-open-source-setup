@@ -44,6 +44,16 @@ EVALUATION_CATALOG = "evals/development-workflow/scenarios.json"
 
 
 def parse_frontmatter(text: str, path: Path, errors: list[str]) -> dict[str, str]:
+    """Parse the simple YAML frontmatter used by skill documents.
+
+    Args:
+        text: Complete document text.
+        path: Document path used in diagnostics.
+        errors: Mutable list receiving parse errors.
+
+    Returns:
+        Parsed frontmatter fields.
+    """
     lines = text.splitlines()
     if not lines or lines[0] != "---":
         errors.append(f"{path}: missing opening YAML delimiter")
@@ -65,6 +75,14 @@ def parse_frontmatter(text: str, path: Path, errors: list[str]) -> dict[str, str
 
 
 def validate_skill(root: Path, name: str, assets: list[str], errors: list[str]) -> None:
+    """Validate one skill and its required assets.
+
+    Args:
+        root: Root directory containing skill directories.
+        name: Skill directory name.
+        assets: Required skill-relative asset paths.
+        errors: Mutable list receiving validation errors.
+    """
     skill_dir = root / name
     skill_file = skill_dir / "SKILL.md"
     if not skill_file.is_file():
@@ -107,6 +125,12 @@ def validate_skill(root: Path, name: str, assets: list[str], errors: list[str]) 
 
 
 def validate_guides(repo: Path, errors: list[str]) -> None:
+    """Validate required human and AI guide references.
+
+    Args:
+        repo: Repository root.
+        errors: Mutable list receiving validation errors.
+    """
     guides = [repo / relative for relative in EXPECTED_GUIDES]
     for guide in guides:
         if not guide.is_file():
@@ -119,6 +143,12 @@ def validate_guides(repo: Path, errors: list[str]) -> None:
 
 
 def validate_handbooks(repo: Path, errors: list[str]) -> None:
+    """Validate required handbook files.
+
+    Args:
+        repo: Repository root.
+        errors: Mutable list receiving validation errors.
+    """
     handbook_root = repo / "docs" / "handbooks"
     for name in EXPECTED_HANDBOOKS:
         handbook = handbook_root / name
@@ -136,6 +166,15 @@ def validate_handbooks(repo: Path, errors: list[str]) -> None:
 
 
 def validate_evaluations(repo: Path, errors: list[str]) -> int:
+    """Validate workflow evaluation scripts and count scenarios.
+
+    Args:
+        repo: Repository root.
+        errors: Mutable list receiving validation errors.
+
+    Returns:
+        Number of catalog scenarios, or zero when validation cannot proceed.
+    """
     script = repo / EVALUATION_SCRIPT
     catalog = repo / EVALUATION_CATALOG
     if not script.is_file():
@@ -174,6 +213,11 @@ def validate_evaluations(repo: Path, errors: list[str]) -> int:
 
 
 def main() -> int:
+    """Validate repository workflow documentation and assets.
+
+    Returns:
+        Process exit status.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--repo",

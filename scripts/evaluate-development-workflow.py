@@ -17,6 +17,8 @@ ALLOWED_OBSERVERS = {"human", "harness", "independent-ai"}
 
 @dataclass(frozen=True)
 class Evaluation:
+    """Store the score and diagnostics for one workflow evaluation."""
+
     passed: bool
     earned: int
     possible: int
@@ -24,6 +26,17 @@ class Evaluation:
 
 
 def read_json(path: Path) -> Any:
+    """Read and decode a JSON document.
+
+    Args:
+        path: JSON file to read.
+
+    Returns:
+        The decoded JSON value.
+
+    Raises:
+        ValueError: If the file is missing or contains invalid JSON.
+    """
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as error:
@@ -33,6 +46,14 @@ def read_json(path: Path) -> Any:
 
 
 def validate_catalog(catalog: Any) -> list[str]:
+    """Validate the workflow scenario catalog structure.
+
+    Args:
+        catalog: Decoded catalog value.
+
+    Returns:
+        Validation error messages, or an empty list when valid.
+    """
     errors: list[str] = []
     if not isinstance(catalog, dict):
         return ["catalog root must be an object"]
@@ -107,6 +128,14 @@ def validate_catalog(catalog: Any) -> list[str]:
 
 
 def result_template(catalog: dict[str, Any]) -> dict[str, Any]:
+    """Create a blank observation result document for a catalog.
+
+    Args:
+        catalog: Validated workflow catalog.
+
+    Returns:
+        A result document ready for an observer to complete.
+    """
     return {
         "catalog_schema_version": catalog["schema_version"],
         "run_id": "replace-with-run-id",
@@ -136,6 +165,16 @@ def result_template(catalog: dict[str, Any]) -> dict[str, Any]:
 def evaluate_results(
     catalog: dict[str, Any], results: Any, *, allow_partial: bool = False
 ) -> Evaluation:
+    """Score observed workflow results against the catalog.
+
+    Args:
+        catalog: Validated workflow catalog.
+        results: Decoded observation result document.
+        allow_partial: Whether missing scenarios should be permitted.
+
+    Returns:
+        Evaluation score and any validation diagnostics.
+    """
     messages: list[str] = []
     earned = 0
     possible = 0
@@ -227,6 +266,14 @@ def evaluate_results(
 
 
 def self_test(catalog: dict[str, Any]) -> list[str]:
+    """Verify that the evaluator accepts and rejects known fixtures.
+
+    Args:
+        catalog: Validated workflow catalog.
+
+    Returns:
+        Error messages produced by failed self-test cases.
+    """
     passing = result_template(catalog)
     passing["run_id"] = "evaluator-self-test"
     passing["observer"]["name"] = "deterministic-fixture"
@@ -266,6 +313,11 @@ def self_test(catalog: dict[str, Any]) -> list[str]:
 
 
 def main() -> int:
+    """Run catalog validation, self-tests, or result scoring.
+
+    Returns:
+        Process exit status.
+    """
     parser = argparse.ArgumentParser(
         description="Validate workflow scenarios or score externally observed runs."
     )
