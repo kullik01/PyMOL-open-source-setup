@@ -303,7 +303,15 @@ def prepare_inno_setup() -> None:
   """Prepare the Windows Inno Setup staging tree without compiling it."""
   if platform.system() != "Windows":
     raise RuntimeError("Inno Setup preparation is only supported on Windows.")
-  _prepare_inno_setup_environment()
+  from scripts.python.windows_bundle import BundleConfig, prepare_inno_staging
+
+  bundle = _PROJECT_ROOT / "dist/windows-x86_64-bundle"
+  prepare_inno_staging(
+    bundle,
+    _PROJECT_ROOT / "inno-build-release",
+    _PROJECT_ROOT / "os_specific/windows/logo.ico",
+    BundleConfig(_PROJECT_ROOT, bundle, _PROJECT_ROOT / "uv.lock"),
+  )
 
 
 @task
@@ -313,8 +321,21 @@ def build_inno_setup(architecture: str = "x64") -> None:
     raise RuntimeError("Inno Setup is only supported on Windows.")
   if architecture not in ("x86", "x64"):
     raise ValueError("architecture must be 'x86' or 'x64'")
+  if architecture == "x86":
+    raise RuntimeError(
+      "Windows x86 Inno packaging is retired and unsupported; use x64."
+    )
 
-  _prepare_inno_setup_environment()
+  if architecture == "x64":
+    from scripts.python.windows_bundle import BundleConfig, prepare_inno_staging
+
+    bundle = _PROJECT_ROOT / "dist/windows-x86_64-bundle"
+    prepare_inno_staging(
+      bundle,
+      _PROJECT_ROOT / "inno-build-release",
+      _PROJECT_ROOT / "os_specific/windows/logo.ico",
+      BundleConfig(_PROJECT_ROOT, bundle, _PROJECT_ROOT / "uv.lock"),
+    )
   project_root = _PROJECT_ROOT
   script_path = project_root / f"os_specific/windows/inno_setup/setup_{architecture}.iss"
   compiler = shutil.which("iscc")
@@ -591,6 +612,39 @@ def test(match: str = "", verbose: str = "false") -> None:
     # expression while still allowing pytest expressions like 'api or db'.
     cmd_parts.extend(["-k", shlex.quote(match)])
   run(" ".join(cmd_parts), cwd=_PROJECT_ROOT)
+
+
+@task
+def build_windows_bundle() -> None:
+  """Build the approved relocatable Windows x86_64 standalone bundle."""
+  if platform.system() != "Windows":
+    raise RuntimeError("Windows standalone bundle is only supported on Windows.")
+  from scripts.python.windows_bundle import BundleConfig, build
+
+  build(BundleConfig(
+      root=_PROJECT_ROOT,
+      output=_PROJECT_ROOT / "dist/windows-x86_64-bundle",
+      lockfile=_PROJECT_ROOT / "uv.lock",
+  ))
+
+
+@task
+def package_windows_bundle() -> None:
+  """Create a deterministic ZIP from the existing Windows x86_64 bundle."""
+  if platform.system() != "Windows":
+    raise RuntimeError("Windows bundle packaging is only supported on Windows.")
+  from scripts.python.windows_bundle import (
+    ARCHIVE_NAME,
+    BundleConfig,
+    create_deterministic_archive,
+  )
+
+  bundle = _PROJECT_ROOT / "dist/windows-x86_64-bundle"
+  create_deterministic_archive(
+    bundle,
+    _PROJECT_ROOT / "dist" / ARCHIVE_NAME,
+    BundleConfig(_PROJECT_ROOT, bundle, _PROJECT_ROOT / "uv.lock"),
+  )
 
 # </editor-fold>
 
