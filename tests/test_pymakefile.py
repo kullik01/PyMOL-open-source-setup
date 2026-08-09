@@ -371,6 +371,20 @@ class PymakeBuildTaskTest(unittest.TestCase):
       pymakefile.build_windows_bundle()
     build.assert_called_once()
 
+  def test_windows_artifact_task_guards_platform(self) -> None:
+    with mock.patch.object(pymakefile.platform, "system", return_value="Linux"):
+      with self.assertRaisesRegex(RuntimeError, "only supported on Windows"):
+        pymakefile.build_windows_artifacts()
+
+  def test_windows_artifact_task_orders_bundle_zip_and_installer(self) -> None:
+    calls = []
+    with mock.patch.object(pymakefile.platform, "system", return_value="Windows"), \
+        mock.patch.object(pymakefile, "build_windows_bundle", side_effect=lambda: calls.append("bundle")), \
+        mock.patch.object(pymakefile, "package_windows_bundle", side_effect=lambda: calls.append("zip")), \
+        mock.patch.object(pymakefile, "build_inno_setup", side_effect=lambda architecture: calls.append(architecture)):
+      pymakefile.build_windows_artifacts()
+    self.assertEqual(calls, ["bundle", "zip", "x64"])
+
   def test_overlay_inventory_preserves_required_files(self) -> None:
     inventory = windows_bundle.overlay_inventory(Path("root"))
     self.assertEqual(len(inventory), 6)
@@ -589,12 +603,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     )
     self.assertIn("win_arch: ['x64']", workflow)
     self.assertNotIn("win_arch: ['x86', 'x64']", workflow)
-    for command in (
-        "python pymakefile.py build_windows_bundle",
-        "python pymakefile.py package_windows_bundle",
-        "python pymakefile.py prepare_inno_setup",
-    ):
-      self.assertIn(command, workflow)
+    self.assertIn("python pymakefile.py build_windows_artifacts", workflow)
     self.assertIn("name: Verify pymake interpreter", workflow)
     self.assertNotIn(".\\pymake.bat build_windows_bundle", workflow)
     self.assertNotIn(".\\pymake.bat package_windows_bundle", workflow)
@@ -605,7 +614,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
     )
     self.assertLess(
         workflow.index("Verify pymake interpreter"),
-        workflow.index("python pymakefile.py build_windows_bundle"),
+        workflow.index("python pymakefile.py build_windows_artifacts"),
     )
     project = tomllib.loads(
         (pymakefile._PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
@@ -672,16 +681,13 @@ class PymakeBuildTaskTest(unittest.TestCase):
     self.assertNotIn("-OutFile inno-setup.exe", workflow)
     self.assertNotIn(".\\inno-setup.exe /SILENT", workflow)
     self.assertIn(
-        '& "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe"', workflow
+        'C:\\Program Files (x86)\\Inno Setup 6', workflow
     )
     self.assertNotIn("\n          iscc ", workflow)
-    command_order = [
-        workflow.index("python pymakefile.py build_windows_bundle"),
-        workflow.index("python pymakefile.py package_windows_bundle"),
-        workflow.index("python pymakefile.py prepare_inno_setup"),
-        workflow.index("Compile .iss file"),
-    ]
-    self.assertEqual(command_order, sorted(command_order))
+    self.assertNotIn("python pymakefile.py build_windows_bundle", workflow)
+    self.assertNotIn("python pymakefile.py package_windows_bundle", workflow)
+    self.assertNotIn("python pymakefile.py prepare_inno_setup", workflow)
+    self.assertNotIn("Compile .iss file", workflow)
 
   def test_windows_docs_and_uv_workflow_pin_match_supported_flow(self) -> None:
     workflow = (
@@ -818,6 +824,9 @@ class PymakeBuildTaskTest(unittest.TestCase):
       manifest_timestamp = json.loads(
           (bundle / "manifest.json").read_text(encoding="utf-8")
       )["timestamp"]
+      bundle_commit = json.loads(
+          (bundle / "manifest.json").read_text(encoding="utf-8")
+      )["git_commit"]
       shutil.copy2(pymakefile._PROJECT_ROOT / "uv.lock", root / "uv.lock")
       (root / "os_specific/windows").mkdir(parents=True)
       (root / "os_specific/windows/logo.ico").write_text("logo")
@@ -831,7 +840,7 @@ class PymakeBuildTaskTest(unittest.TestCase):
       ), mock.patch.object(
           windows_bundle.subprocess,
           "check_output",
-          return_value="ffbe888a06d8a7464cd5239f88b99a1bc803a4e5\n",
+          return_value=bundle_commit + "\n",
       ):
         pymakefile.prepare_inno_setup()
 

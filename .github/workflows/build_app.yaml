@@ -90,17 +90,11 @@ jobs:
           python --version
           python -c "import sys; assert sys.version_info[:2] == (3, 11), sys.executable; print(sys.executable)"
 
-      - name: Build standalone x64 bundle and package inputs
+      - name: Build Windows x64 artifacts
         run: |
-          python pymakefile.py build_windows_bundle
-          python pymakefile.py package_windows_bundle
-          python pymakefile.py prepare_inno_setup
+          python pymakefile.py build_windows_artifacts
 
         shell: powershell
-
-      - name: Compile .iss file
-        run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion="${{ env.PROJECT_VERSION }}" os_specific/windows/inno_setup/setup_x64.iss
 
       - name: Upload Windows x64 installer
         uses: actions/upload-artifact@v4

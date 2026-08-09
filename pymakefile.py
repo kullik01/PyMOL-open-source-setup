@@ -42,6 +42,7 @@ Design principles:
 """
 
 import inspect
+import os
 import pathlib
 import platform
 import shlex
@@ -348,7 +349,12 @@ def build_inno_setup(architecture: str = "x64") -> None:
         "Inno Setup compiler not found. Install ISCC.exe or add iscc to PATH."
       )
     compiler = str(compiler_path)
-  _run_process([compiler, str(script_path)])
+  compiler_args = [compiler]
+  project_version = os.environ.get("PROJECT_VERSION")
+  if project_version:
+    compiler_args.append(f"/DMyAppVersion={project_version}")
+  compiler_args.append(str(script_path))
+  _run_process(compiler_args)
 
 
 def _parse_args(argv: List[str]) -> Tuple[List[str], Dict[str, str]]:
@@ -645,6 +651,16 @@ def package_windows_bundle() -> None:
     _PROJECT_ROOT / "dist" / ARCHIVE_NAME,
     BundleConfig(_PROJECT_ROOT, bundle, _PROJECT_ROOT / "uv.lock"),
   )
+
+
+@task
+def build_windows_artifacts() -> None:
+  """Build the Windows x86_64 bundle, ZIP, and x64 installer in order."""
+  if platform.system() != "Windows":
+    raise RuntimeError("Windows artifact builds are only supported on Windows.")
+  build_windows_bundle()
+  package_windows_bundle()
+  build_inno_setup("x64")
 
 # </editor-fold>
 
