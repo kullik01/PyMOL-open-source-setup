@@ -69,8 +69,8 @@ jobs:
 
       - name: Build frozen Python application
         run: |
-          .\win_automator.bat build app
-          .\win_automator.bat build inno_setup_ci
+          .\pymake.bat build_app
+          .\pymake.bat prepare_inno_setup
 
         shell: powershell
 
@@ -124,8 +124,8 @@ jobs:
 
       - name: Build app package
         run: |
-          chmod +x ./automator.sh
-          ./automator.sh build app
+          chmod +x ./pymake.sh
+          ./pymake.sh build_app
 
       - name: Ad-hoc Sign App Bundle
         run: |
@@ -185,8 +185,8 @@ jobs:
 
       - name: Build app package
         run: |
-          chmod +x ./automator.sh
-          ./automator.sh build app
+          chmod +x ./pymake.sh
+          ./pymake.sh build_app
 
       - name: Build tar.gz portable installation
         run: |

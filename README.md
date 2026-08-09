@@ -54,16 +54,16 @@ The following information is about building a platform dependent package/setup f
 #### Windows
 If you are on Windows run:
 ```shell
-.\win_automator.bat build app
+.\pymake.bat build_app
 ```
 ```shell
-.\win_automator.bat build inno_setup
+.\pymake.bat build_inno_setup architecture=x64
 ```
 
 #### macOS
 If you are on macOS:
 ```shell
-chmod +x ./automator.sh && ./automator.sh build app
+chmod +x ./pymake.sh && ./pymake.sh build_app
 ```
 To build the DMG use a tool like [create-dmg](https://github.com/create-dmg/create-dmg) or fork the repository 
 and run the GitHub action build_app.yaml.
@@ -71,7 +71,7 @@ and run the GitHub action build_app.yaml.
 #### Linux
 If you are on Linux:
 ```shell
-chmod +x ./automator.sh && ./automator.sh build app
+chmod +x ./pymake.sh && ./pymake.sh build_app
 ```
 To build the tar.gz run:
 ```shell

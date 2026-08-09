@@ -42,10 +42,13 @@ Design principles:
 """
 
 import inspect
+import pathlib
+import platform
 import shlex
+import shutil
 import subprocess
-
 import sys
+import sysconfig
 import textwrap
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -54,6 +57,9 @@ from typing import Callable, Dict, List, Optional, Tuple
 # A task callable as stored in the registry.
 _TaskFunc = Callable[..., None]
 # </editor-fold>
+
+# Absolute repository root so tasks work regardless of the caller's directory.
+_PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
 
 # <editor-fold desc="Module-level task registry">
 # Maps task name → registered callable.  Insertion order is preserved (Python
@@ -131,6 +137,7 @@ def run(
         check: bool = True,
         capture: bool = False,
         env: Optional[Dict[str, str]] = None,
+        cwd: Optional[pathlib.Path] = None,
 ) -> Optional[str]:
   """Executes a shell command, printing it to stdout before running.
 
@@ -154,6 +161,8 @@ def run(
           output of a command is needed programmatically.
       env: Optional mapping of environment variables to pass to the child
           process.  When ``None``, the parent environment is inherited.
+      cwd: Optional working directory for the child process.  When ``None``,
+          the caller's working directory is inherited.
 
   Returns:
       The captured stdout string (stripped of leading/trailing whitespace)
@@ -183,10 +192,142 @@ def run(
     capture_output=capture,
     text=True,
     env=env,
+    cwd=cwd,
   )
   if capture:
     return result.stdout.strip()
   return None
+
+
+def _run_process(args: List[str], *, cwd: Optional[pathlib.Path] = None) -> None:
+  """Runs an executable with an argument list and fails on errors."""
+  print(_colorize(f"$ {shlex.join(args)}", _COLOR_GREY))
+  subprocess.run(args, check=True, cwd=cwd)
+
+
+def _platform_build_paths() -> Tuple[pathlib.Path, pathlib.Path, str]:
+  """Returns the platform directory, PyMOL package, and build command."""
+  system = platform.system()
+  if system == "Windows":
+    platform_dir = _PROJECT_ROOT / "os_specific/windows"
+    build_command = "build_exe"
+  elif system == "Darwin":
+    platform_dir = _PROJECT_ROOT / "os_specific/macos"
+    build_command = "bdist_mac"
+  elif system == "Linux":
+    platform_dir = _PROJECT_ROOT / "os_specific/linux"
+    build_command = "build_exe"
+  else:
+    raise RuntimeError(f"Unsupported platform: {system}")
+
+  package_dir = pathlib.Path(sysconfig.get_path("purelib")) / "pymol"
+  return platform_dir, package_dir, build_command
+
+
+def _copy_build_customizations(package_dir: pathlib.Path) -> None:
+  """Copies repository-specific files into the installed PyMOL package."""
+  project_root = _PROJECT_ROOT
+  platform_name = {
+    "Windows": "windows",
+    "Darwin": "macos",
+    "Linux": "linux",
+  }[platform.system()]
+  copies = {
+    project_root / "edited/pmg_qt/pymol_qt_gui.py":
+      package_dir.parent / "pmg_qt/pymol_qt_gui.py",
+    project_root / "edited/pymol/data/pymol/base.css":
+      package_dir / "base.css",
+    project_root / "edited/pymol/__init__.py": package_dir / "__init__.py",
+    project_root / "edited/pymol/startup_wrapper.py":
+      package_dir / "startup_wrapper.py",
+    project_root / "alternative_design/alt_logo.png":
+      package_dir / "data/pymol/icons/alt_logo.png",
+    project_root / "os_specific" / platform_name / "splash.png":
+      package_dir / "data/pymol/splash.png",
+  }
+  for source, destination in copies.items():
+    shutil.copy(source, destination)
+
+
+def _prepare_inno_setup_environment() -> None:
+  """Creates the temporary source and asset tree used by Inno Setup."""
+  project_root = _PROJECT_ROOT
+  build_path = project_root / "inno-build-release"
+  build_source_path = build_path / "inno-sources"
+  build_assets_path = build_path / "inno-assets"
+  python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+  app_build_path = project_root / f"dist/exe.win-amd64-{python_version}"
+  logo_path = project_root / "os_specific/windows/logo.ico"
+  redistributable_path = project_root / "vendor/microsoft/VC_redist.x64.exe"
+
+  required_paths = (app_build_path, logo_path, redistributable_path)
+  missing_paths = [path for path in required_paths if not path.exists()]
+  if missing_paths:
+    missing = ", ".join(str(path) for path in missing_paths)
+    raise FileNotFoundError(
+      f"Cannot prepare Inno Setup; missing {missing}. Run build_app first."
+    )
+
+  if build_path.exists():
+    shutil.rmtree(build_path)
+  build_assets_path.mkdir(parents=True)
+  shutil.copytree(app_build_path, build_source_path)
+  shutil.copy(redistributable_path, build_source_path)
+  shutil.copy(logo_path, build_assets_path / "logo.ico")
+
+
+@task
+def build_app() -> None:
+  """Build the frozen PyMOL application for the current platform."""
+  platform_dir, package_dir, build_command = _platform_build_paths()
+  if not package_dir.exists():
+    raise FileNotFoundError(
+      f"PyMOL is not installed in the active environment: {package_dir}"
+    )
+
+  _copy_build_customizations(package_dir)
+  build_script = platform_dir / "setup_build_exe.py"
+  _run_process(
+    [sys.executable, str(build_script), build_command],
+    cwd=platform_dir,
+  )
+  shutil.copytree(
+    platform_dir / "build",
+    _PROJECT_ROOT / "dist",
+    dirs_exist_ok=True,
+  )
+
+
+@task
+def prepare_inno_setup() -> None:
+  """Prepare the Windows Inno Setup staging tree without compiling it."""
+  if platform.system() != "Windows":
+    raise RuntimeError("Inno Setup preparation is only supported on Windows.")
+  _prepare_inno_setup_environment()
+
+
+@task
+def build_inno_setup(architecture: str = "x64") -> None:
+  """Build the Windows installer for ``x86`` or ``x64`` architecture."""
+  if platform.system() != "Windows":
+    raise RuntimeError("Inno Setup is only supported on Windows.")
+  if architecture not in ("x86", "x64"):
+    raise ValueError("architecture must be 'x86' or 'x64'")
+
+  _prepare_inno_setup_environment()
+  project_root = _PROJECT_ROOT
+  script_path = project_root / f"os_specific/windows/inno_setup/setup_{architecture}.iss"
+  compiler = shutil.which("iscc")
+  if compiler is None:
+    compiler_path = pathlib.Path(
+      r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+    )
+    if not compiler_path.exists():
+      raise FileNotFoundError(
+        "Inno Setup compiler not found. Install ISCC.exe or add iscc to PATH."
+      )
+    compiler = str(compiler_path)
+  _run_process([compiler, str(script_path)])
 
 
 def _parse_args(argv: List[str]) -> Tuple[List[str], Dict[str, str]]:
@@ -286,10 +427,11 @@ def _main() -> None:
       1. No arguments, ``-h``, or ``--help`` → print the help menu and exit 0.
       2. Unknown task name → print an error and exit 1.
       3. Valid task with well-formed arguments → invoke the task function.
-      4. Argument mismatch (``TypeError``) → print a usage hint and exit 1.
-      5. ``subprocess.CalledProcessError`` from a ``run()`` call → print the
-         failing command and exit with the command's own exit code.
-      6. ``KeyboardInterrupt`` → exit 130 (SIGINT convention).
+       4. Argument mismatch (``TypeError``) → print a usage hint and exit 1.
+       5. ``subprocess.CalledProcessError`` from a ``run()`` call → print the
+          failing command and exit with the command's own exit code.
+       6. Task validation or filesystem errors → print the error and exit 1.
+       7. ``KeyboardInterrupt`` → exit 130 (SIGINT convention).
 
   Raises:
       SystemExit: Always; exit code 0 on success, non-zero on any error.
@@ -362,6 +504,9 @@ def _main() -> None:
       file=sys.stderr,
     )
     sys.exit(exc.returncode)
+  except (OSError, RuntimeError, ValueError) as exc:
+    print(_colorize(f"Task failed: {exc}", _COLOR_RED), file=sys.stderr)
+    sys.exit(1)
   except KeyboardInterrupt:
     # Conventional exit code for SIGINT.
     print(_colorize("\nInterrupted.", _COLOR_YELLOW), file=sys.stderr)
@@ -372,7 +517,7 @@ def _main() -> None:
 
 # <editor-fold desc="Tasks">
 @task
-def format(check: str = "false") -> None:  # noqa: A001  (shadows builtin intentionally)
+def format(check: str = "false") -> None:
   """Format the codebase with Ruff.
 
   Runs `Ruff <https://docs.astral.sh/ruff/>`_ in either reformat or
@@ -389,7 +534,7 @@ def format(check: str = "false") -> None:  # noqa: A001  (shadows builtin intent
       ./pymake.bat/sh format check=true # CI dry-run; fail if changes needed.
   """
   flag = "--check" if check.lower() == "true" else ""
-  run(f"ruff format {flag} .")
+  run(f"ruff format {flag} .", cwd=_PROJECT_ROOT)
 
 
 @task
@@ -404,7 +549,7 @@ def lint(fix: str = "false") -> None:
           possible.  Defaults to ``"false"``.
   """
   flag = "--fix" if fix.lower() == "true" else ""
-  run(f"ruff check {flag} .")
+  run(f"ruff check {flag} .", cwd=_PROJECT_ROOT)
 
 
 @task
@@ -414,7 +559,7 @@ def check_types() -> None:
   Executes `mypy <https://mypy-lang.org/>`_ across the project
   to verify type safety based on the configuration in ``mypy.ini``.
   """
-  run("mypy")
+  run("mypy", cwd=_PROJECT_ROOT)
 
 
 @task
@@ -445,7 +590,7 @@ def test(match: str = "", verbose: str = "false") -> None:
     # Use shlex.quote to prevent accidental shell injection from the match
     # expression while still allowing pytest expressions like 'api or db'.
     cmd_parts.extend(["-k", shlex.quote(match)])
-  run(" ".join(cmd_parts))
+  run(" ".join(cmd_parts), cwd=_PROJECT_ROOT)
 
 # </editor-fold>
 
